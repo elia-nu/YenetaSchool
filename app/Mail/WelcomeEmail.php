@@ -3,24 +3,27 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use App\Models\RegisteredStudent;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
 class WelcomeEmail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    protected RegisteredStudent $event;
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(RegisteredStudent $event)
     {
-        //
+        $this->event = $event;
     }
 
     /**
@@ -30,7 +33,9 @@ class WelcomeEmail extends Mailable
      */
     public function envelope()
     {
-        return new Envelope('datwii123@gmail.com');
+        return new Envelope(
+            subject: 'Welcome Email',
+        );
     }
 
     /**
@@ -40,8 +45,14 @@ class WelcomeEmail extends Mailable
      */
     public function content()
     {
-        return new Content('emails.welcome'); // Replace 'emails.welcome' with the actual view name
+        return new Content(
+            view: 'emails.welcome',
+            with: [
+                'student' => $this->event->student,
+            ],
+        );
     }
+
     /**
      * Get the attachments for the message.
      *

@@ -40,7 +40,7 @@ Route::get('', function(){
     return 'weee';
 
 });
- 
+
 
 
 //RegisteredStudent
@@ -178,8 +178,4 @@ Route::post('/auth/login', [UserController::class, 'loginUser']);
 //payment
 
 Route::post('checkout', [PaymentController::class, 'createCheckoutSession']);
-
-//Email
-
-Route::post('/send-email', [MailController::class, 'sendEmail']);
 

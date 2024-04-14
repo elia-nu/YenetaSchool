@@ -15,12 +15,12 @@ return new class extends Migration
     {
         Schema::create('why', function (Blueprint $table) {
             $table->id();
-$table->text('Vision')->nullable();
-$table->text('Vision_am')->nullable();
-$table->text('mission')->nullable();
-$table->text('mission_am')->nullable();
-$table->text('value')->nullable();
-$table->text('value_am')->nullable();
+            $table->text('Vision')->nullable();
+            $table->text('Vision_am')->nullable();
+            $table->text('mission')->nullable();
+            $table->text('mission_am')->nullable();
+            $table->text('value')->nullable();
+            $table->text('value_am')->nullable();
             $table->timestamps();
         });
     }

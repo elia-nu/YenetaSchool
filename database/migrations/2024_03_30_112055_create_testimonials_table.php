@@ -16,10 +16,10 @@ return new class extends Migration
         Schema::create('testimonials', function (Blueprint $table) {
             $table->id();
             $table->string('image')->nullable();
-$table->string('author')->nullable();
-$table->string('professional')->nullable();
-$table->string('professional_am')->nullable();
-$table->integer('rating')->nullable();
+            $table->string('author')->nullable();
+            $table->string('professional')->nullable();
+            $table->string('professional_am')->nullable();
+            $table->integer('rating')->nullable();
             $table->timestamps();
         });
     }

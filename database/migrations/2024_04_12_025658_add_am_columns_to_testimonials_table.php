@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::table('testimonials', function (Blueprint $table) {
             $table->string('author_am')->nullable(); // Assuming you want this to be nullable
-            $table->string('professional_am')->nullable(); // Assuming this is also missing and needed
+            // $table->string('professional_am')->nullable(); // Assuming this is also missing and needed
         });
     }
     /**
@@ -23,7 +23,7 @@ return new class extends Migration
      *
      * @return void
      */
-   
+
 
     public function down()
     {
