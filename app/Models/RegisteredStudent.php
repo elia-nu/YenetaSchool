@@ -9,12 +9,10 @@ class RegisteredStudent extends Model
 {
     use HasFactory;
 
+    protected $table = 'registeredstudent';
+
     protected $fillable = [
         'StudentId', 'Name', 'Course', 'Semester','Start_Date','End_Date', 'PaymentStatus'
     ];
 
-    public function student()
-    {
-        return $this->belongsTo(Student::class, 'StudentId');
-    }
-}
+  }

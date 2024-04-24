@@ -11,12 +11,15 @@ use Illuminate\Support\Facades\Mail;
 class ProgramsController extends Controller
 {
     // Get all programs
-    public function index()
+    public function index(Request $request)
     {
-        $programs = programs::all();
-        
+        $offset = $request->input('offset', 0);
+        $limit = $request->input('limit', 10);
+        $programs = programs::offset($offset)->limit($limit)->latest()->get();
+    
+        $messagesCount = $programs->count();
         if($programs->isEmpty()) {
-            return response()->json(['message' => 'No programs found', 'status' => 0]);
+            return response()->json(['message' => 'No programs found', 'status' => 0, 'length' => $messagesCount]);
         }
         
         return response()->json(['message' => 'Programs retrieved successfully', 'status' => 1, 'data' => $programs]);

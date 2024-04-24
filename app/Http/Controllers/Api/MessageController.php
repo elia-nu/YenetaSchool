@@ -5,12 +5,15 @@ use App\Models\Message;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\SendEmailNotification;
 class MessageController extends Controller
 {
-
-    public function index()
+    public function index(Request $request)
     {
-        $messages = Message::all();
+        $offset = $request->input('offset', 0);
+        $limit = $request->input('limit', 10);
+        $messages = Message::offset($offset)->limit($limit)->latest()->get();
         
         $messagesCount = $messages->count();
         
@@ -30,7 +33,11 @@ class MessageController extends Controller
         ]);
     
         $messages = Message::create($validatedData);
-        return response()->json(['message' => 'Message created successfully', 'status' => 1], Response::HTTP_CREATED);
+        
+        // Sending email notification
+        \Mail::to($validatedData['email'])->send(new \App\Mail\SendEmailNotification($validatedData['email'], $validatedData['name']));
+        
+        return response()->json(['message' => 'Message created successfully', 'status' => 1 ,'message' => $messages], Response::HTTP_CREATED);
     }
     // Get a specific Message by id
     public function show(Message $messages)

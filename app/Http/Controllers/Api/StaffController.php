@@ -7,13 +7,12 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 class StaffController extends Controller
 {
-
     public function index()
     {
-        $staff = Staff::all();
+        $staff = Staff::latest()->get();
         
         if($staff->isEmpty()) {
-            return response()->json(['message' => 'No staff found', 'status' => 0]);
+            return response()->json(['message' => 'No staff found', 'status' => 0 , 'length' => $messagesCount]);
         }
         
         return response()->json(['message' => 'Staff retrieved successfully', 'status' => 1, 'data' => $staff]);

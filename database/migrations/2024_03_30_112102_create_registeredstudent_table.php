@@ -21,8 +21,7 @@ return new class extends Migration
             $table->integer('Semester');
             $table->string('PaymentStatus', 100);
 
-            $table->foreign('StudentId')->references('id')->on('students')->onDelete('cascade');
-     
+   
             $table->timestamps();
         });
     }

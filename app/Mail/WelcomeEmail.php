@@ -48,10 +48,11 @@ class WelcomeEmail extends Mailable
         return new Content(
             view: 'emails.welcome',
             with: [
-                'student' => $this->event->student,
+                'Registerdstudent' => $this->event,
             ],
         );
     }
+    
 
     /**
      * Get the attachments for the message.

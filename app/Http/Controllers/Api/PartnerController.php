@@ -3,13 +3,18 @@ namespace App\Http\Controllers\Api;
 use App\Models\Partner;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\SendEmailNotification;
 class PartnerController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
-        $messages = Partner::all();
+        $offset = $request->input('offset', 0);
+        $limit = $request->input('limit', 10);
+        $messages = Partner::offset($offset)->limit($limit)->latest()->get();
         
         $messagesCount = $messages->count();
         
@@ -26,10 +31,12 @@ class PartnerController extends Controller
             'companyName' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'message' => 'required|string',
-            'Phone' => 'required|string',
+            'phone' => 'required|string',
         ]);
         $validatedData['status'] = false;
         $messages = Partner::create($validatedData);
+        \Mail::to($validatedData['email'])->send(new \App\Mail\SendEmailNotificationpart($validatedData['email'], $validatedData['companyName']));
+      
         return response()->json(['message' => 'Message created successfully', 'status' => 1], Response::HTTP_CREATED);
     }
     // Get a specific Message by id

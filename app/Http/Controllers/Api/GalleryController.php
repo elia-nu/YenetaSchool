@@ -9,10 +9,11 @@ use Illuminate\Http\Response;
 class GalleryController extends Controller
 
 {
-
-    public function index()
+    public function index(Request $request)
     {
-        $gallery = Gallery::all();
+        $offset = $request->input('offset', 0);
+        $limit = $request->input('limit', 10);
+        $gallery = Gallery::offset($offset)->limit($limit)->latest()->get();
         
         if($gallery->isEmpty()) {
             return response()->json(['message' => 'No gallery found', 'status' => 0]);

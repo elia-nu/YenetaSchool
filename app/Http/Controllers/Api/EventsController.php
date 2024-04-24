@@ -9,9 +9,11 @@ use Illuminate\Http\Response;
 class EventsController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
-        $events = Event::all();
+        $offset = $request->input('offset', 0);
+        $limit = $request->input('limit', 10);
+        $events = Event::offset($offset)->limit($limit)->latest()->get();
         
         if($events->isEmpty()) {
             return response()->json(['message' => 'No events found', 'status' => 0]);

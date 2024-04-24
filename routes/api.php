@@ -49,7 +49,9 @@ Route::get('RegisteredStudent', [RegisteredStudentsController::class, 'index'])-
 Route::get('RegisteredStudents/{program}', [RegisteredStudentsController::class, 'show'])->name('RegisteredStudents.show');
 Route::post('RegisteredStudents', [RegisteredStudentsController::class, 'store']);
 Route::put('/RegisteredStudents/{program}', [RegisteredStudentsController::class, 'update']);
+Route::put('/verify/{program}', [RegisteredStudentsController::class, 'verify']);
 Route::delete('/RegisteredStudents/{program}', [RegisteredStudentsController::class, 'destroy']);
+Route::get('/PendingPayment', [RegisteredStudentsController::class, 'Unpaid']);
 
 
 //Gallerys
@@ -109,6 +111,7 @@ Route::delete('/Staff/{program}', [StaffController::class, 'destroy']);
 
 Route::get('Students', [StudentsController::class, 'index'])->name('Students.index');
 Route::get('Students/{program}', [StudentsController::class, 'show'])->name('Students.show');
+Route::get('showbyid/{program}', [StudentsController::class, 'showbyid'])->name('Students.show');
 Route::post('Students', [StudentsController::class, 'store']);
 Route::put('/Students/{program}', [StudentsController::class, 'update']);
 Route::delete('/Students/{program}', [StudentsController::class, 'destroy']);

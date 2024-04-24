@@ -8,16 +8,19 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 class TestimonialController extends Controller
 {
-
-    public function index()
+    public function index(Request $request)
     {
-        $testimonial = Testimonial::all();
+        $offset = $request->input('offset', 0);
+        $limit = $request->input('limit', 10);
+        $testimonial = Testimonial::offset($offset)->limit($limit)->latest()->get(); // Fetch testimonials in descending order
+        
+        $messagesCount = Testimonial::count(); // Count all testimonials
         
         if($testimonial->isEmpty()) {
-            return response()->json(['message' => 'No testimonial found', 'status' => 0]);
+            return response()->json(['message' => 'No testimonial found', 'status' => 0 , 'length' => $messagesCount]);
         }
         
-        return response()->json(['message' => 'Testimonial retrieved successfully', 'status' => 1, 'data' => $testimonial]);
+        return response()->json(['message' => 'Testimonial retrieved successfully', 'status' => 1, 'data' => $testimonial, 'length' => $messagesCount]);
     }
     public function store(Request $request)
     {

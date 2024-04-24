@@ -10,10 +10,10 @@ class ServicesController extends Controller
 
     public function index()
     {
-        $services = Service::all();
+        $services = Service::latest()->get();
         
         if($services->isEmpty()) {
-            return response()->json(['message' => 'No Services found', 'status' => 0]);
+            return response()->json(['message' => 'No Services found', 'status' => 0 , 'length' => $messagesCount]);
         }
         
         return response()->json(['message' => 'Service retrieved successfully3', 'status' => 1, 'data' => $services]);

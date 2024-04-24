@@ -17,23 +17,13 @@ class StudentEnrolled
 
     protected RegisteredStudent $registeredstudent;
 
-    /**
-     * Create a new event instance.
-     *
-     * @return void
-     */
     public function __construct(RegisteredStudent $registeredstudent)
     {
         $this->registeredstudent = $registeredstudent;
     }
 
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return \Illuminate\Broadcasting\Channel|array
-     */
-    // public function broadcastOn()
-    // {
-    //     return new PrivateChannel('channel-name');
-    // }
+    public function getRegisteredStudent(): RegisteredStudent
+    {
+        return $this->registeredstudent;
+    }
 }

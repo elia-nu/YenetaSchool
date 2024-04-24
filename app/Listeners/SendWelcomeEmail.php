@@ -26,8 +26,9 @@ class SendWelcomeEmail
      * @param  object  $event
      * @return void
      */
-    public function handle(RegisteredStudent $event)
+    public function handle(\App\Events\StudentEnrolled $event)
     {
-        Mail::to($event->student->email)->send(new WelcomeEmail($event));
+        $rtegisteredStuden = $event->getRegisteredStudent();
+        Mail::to($registeredStudent->Semester)->send(new WelcomeEmail($registeredStudent));
     }
 }
