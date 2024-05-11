@@ -15,7 +15,7 @@ class MessageController extends Controller
         $limit = $request->input('limit', 10);
         $messages = Message::offset($offset)->limit($limit)->latest()->get();
         
-        $messagesCount = $messages->count();
+        $messagesCount = Message::count();
         
         if($messages->isEmpty()) {
             return response()->json(['message' => 'No Messages found', 'status' => 0, 'length' => $messagesCount]);
@@ -48,7 +48,7 @@ class MessageController extends Controller
     // Get a specific Message by id
     public function showbyname($name)
     {
-        $messages = Message::where('title', $name)->first();
+        $messages = Message::where('email', $name)->first();
         
         if(!$messages) {
             return response()->json(['message' => 'Message not found', 'status' => 0]);

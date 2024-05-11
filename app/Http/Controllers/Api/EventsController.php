@@ -14,12 +14,14 @@ class EventsController extends Controller
         $offset = $request->input('offset', 0);
         $limit = $request->input('limit', 10);
         $events = Event::offset($offset)->limit($limit)->latest()->get();
+    
+        $eventsCount = Event::count();
         
         if($events->isEmpty()) {
-            return response()->json(['message' => 'No events found', 'status' => 0]);
+            return response()->json(['message' => 'No events found', 'status' => 0, 'length' => $eventsCount]);
         }
         
-        return response()->json(['message' => 'Event retrieved successfully', 'status' => 1, 'data' => $events]);
+        return response()->json(['message' => 'Event retrieved successfully', 'status' => 1, 'data' => $events, 'length' => $eventsCount]);
     }
     public function store(Request $request)
     {
@@ -51,18 +53,11 @@ class EventsController extends Controller
         return response()->json(['message' => 'Program created successfully', 'status' => 1], Response::HTTP_CREATED);
 
     }
-
-    // Get a specific event by id
-    public function show(Event $program)
-    {
-        return response()->json(['message' => 'Program retrieved successfully', 'status' => 1, 'data' => $program]);
-    }
-    
     
     // Get a specific event by id
-    public function showbyname($name)
+    public function show($name)
     {
-        $event = Event::where('title', $name)->first();
+        $event = Event::where('title', $name)->get();
         
         if(!$event) {
             return response()->json(['message' => 'event not found', 'status' => 0]);

@@ -16,7 +16,7 @@ class PartnerController extends Controller
         $limit = $request->input('limit', 10);
         $messages = Partner::offset($offset)->limit($limit)->latest()->get();
         
-        $messagesCount = $messages->count();
+        $messagesCount = Partner::count();
         
         if($messages->isEmpty()) {
             return response()->json(['message' => 'No Messages found', 'status' => 0, 'length' => $messagesCount]);
@@ -40,11 +40,16 @@ class PartnerController extends Controller
         return response()->json(['message' => 'Message created successfully', 'status' => 1], Response::HTTP_CREATED);
     }
     // Get a specific Message by id
-    public function show(Partner $messages)
+    public function show($name)
     {
-        return response()->json(['message' => 'Message retrieved successfully', 'status' => 1, 'data' => $messages]);
+        $program = Partner::where('email', $name)->get();
+        
+        if(!$program) {
+            return response()->json(['message' => 'Program not found', 'status' => 0]);
+        }
+        
+        return response()->json(['message' => 'Program retrieved successfully', 'status' => 1, 'data' => $program]);
     }
-    
     
     // Delete a specific Message
     public function destroy(Partner $messages)

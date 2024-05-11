@@ -23,7 +23,12 @@ class WhyController extends Controller
     public function update(Request $request, Why $aboutus)
     {
         $validatedData = $request->validate([
-            'title' => 'required|string|max:255',
+            'mission' => 'required|string|',
+            'Vision' => 'required|string|',
+            'value' => 'required|string|',
+            'value_am' => 'required|string|',
+            'Vision_am' => 'required|string|',
+            'mission_am' => 'required|string|',
          
         ]);
     

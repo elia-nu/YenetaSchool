@@ -4,6 +4,8 @@ use App\Http\Controllers\Api\RegisteredStudentsController;
 use App\Http\Controllers\Api\GalleryController;
 use App\Http\Controllers\Api\EventsController;
 use App\Http\Controllers\Api\MessageController;
+use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ServicesController;
 use App\Http\Controllers\Api\StaffController;
 use App\Http\Controllers\Api\StudentsController;
@@ -18,6 +20,7 @@ use App\Http\Controllers\Api\ContactusController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\BlogsController;
 use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\InvoiceController;
 use App\Mail\MailController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -41,15 +44,38 @@ Route::get('', function(){
 
 });
 
+//Order
+Route::get('Order', [OrderController::class, 'index'])->name('RegisteredStudent.index');
+Route::get('OrderStatus', [OrderController::class, 'index1'])->name('RegisteredStudent.index');
+Route::get('search/{program}', [OrderController::class, 'search']);
+Route::get('Order/{program}', [OrderController::class, 'show']);
+Route::post('Order', [OrderController::class, 'store']);
+Route::put('/Order/{program}', [OrderController::class, 'update']);
+Route::delete('/Order/{program}', [OrderController::class, 'destroy']);
+
+
+//Product
+
+Route::get('Product', [ProductController::class, 'index'])->name('RegisteredStudent.index');
+Route::get('search/{program}', [ProductController::class, 'search']);
+Route::get('Product/{program}', [ProductController::class, 'show']);
+Route::post('Product', [ProductController::class, 'store']);
+Route::put('/Product/{program}', [ProductController::class, 'update']);
+Route::delete('/Product/{program}', [ProductController::class, 'destroy']);
+
 
 
 //RegisteredStudent
 
-Route::get('RegisteredStudent', [RegisteredStudentsController::class, 'index'])->name('RegisteredStudent.index');
-Route::get('RegisteredStudents/{program}', [RegisteredStudentsController::class, 'show'])->name('RegisteredStudents.show');
+Route::get('RegisteredStudents', [RegisteredStudentsController::class, 'index'])->name('RegisteredStudent.index');
+Route::get('searchById/{program}', [RegisteredStudentsController::class, 'searchById']);
+Route::get('searchByName/{program}', [RegisteredStudentsController::class, 'searchByName']);
+Route::get('RegisteredStudents/{program}', [RegisteredStudentsController::class, 'show']);
+Route::get('NumReg', [RegisteredStudentsController::class, 'index2']);
 Route::post('RegisteredStudents', [RegisteredStudentsController::class, 'store']);
 Route::put('/RegisteredStudents/{program}', [RegisteredStudentsController::class, 'update']);
 Route::put('/verify/{program}', [RegisteredStudentsController::class, 'verify']);
+Route::put('/verify2/{program}', [RegisteredStudentsController::class, 'verify2']);
 Route::delete('/RegisteredStudents/{program}', [RegisteredStudentsController::class, 'destroy']);
 Route::get('/PendingPayment', [RegisteredStudentsController::class, 'Unpaid']);
 
@@ -112,6 +138,7 @@ Route::delete('/Staff/{program}', [StaffController::class, 'destroy']);
 Route::get('Students', [StudentsController::class, 'index'])->name('Students.index');
 Route::get('Students/{program}', [StudentsController::class, 'show'])->name('Students.show');
 Route::get('showbyid/{program}', [StudentsController::class, 'showbyid'])->name('Students.show');
+Route::get('showbyname/{program}', [StudentsController::class, 'showbyname'])->name('Students.show');
 Route::post('Students', [StudentsController::class, 'store']);
 Route::put('/Students/{program}', [StudentsController::class, 'update']);
 Route::delete('/Students/{program}', [StudentsController::class, 'destroy']);
@@ -178,7 +205,14 @@ Route::put('/contactus/1', [ContactusController::class, 'update']);
 Route::post('/auth/register', [UserController::class, 'createUser']);
 Route::post('/auth/login', [UserController::class, 'loginUser']);
 
-//payment
+//Payment
 
 Route::post('checkout', [PaymentController::class, 'createCheckoutSession']);
 
+//Invoices
+
+Route::get('/invoices', [InvoiceController::class, 'index']);
+Route::post('/invoices', [InvoiceController::class, 'store']);
+Route::get('/invoices/{id}', [InvoiceController::class, 'show']);
+Route::put('/invoices/{id}', [InvoiceController::class, 'update']);
+Route::delete('/invoices/{id}', [InvoiceController::class, 'destroy']);

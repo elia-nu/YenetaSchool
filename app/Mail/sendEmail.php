@@ -27,7 +27,7 @@ class sendEmail extends Mailable
 
     public function build()
     {
-        return $this->subject('Welcome to Our Application!')
+        return $this->subject('Course Registration')
                     ->view('emails.welcome');
     }
 }

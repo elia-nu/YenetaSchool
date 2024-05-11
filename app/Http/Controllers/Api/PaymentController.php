@@ -13,6 +13,7 @@ class PaymentController extends Controller
 
 
     
+
         // Validate request data first
         $validated = $request->validate([
             'product_name' => 'required|string',

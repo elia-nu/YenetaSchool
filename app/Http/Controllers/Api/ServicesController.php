@@ -11,12 +11,13 @@ class ServicesController extends Controller
     public function index()
     {
         $services = Service::latest()->get();
+        $servicesCount = Service::count();
         
         if($services->isEmpty()) {
-            return response()->json(['message' => 'No Services found', 'status' => 0 , 'length' => $messagesCount]);
+            return response()->json(['message' => 'No Services found', 'status' => 0, 'length' => $servicesCount]);
         }
         
-        return response()->json(['message' => 'Service retrieved successfully3', 'status' => 1, 'data' => $services]);
+        return response()->json(['message' => 'Service retrieved successfully', 'status' => 1, 'data' => $services, 'length' => $servicesCount]);
     }
     public function store(Request $request)
     {
@@ -37,15 +38,12 @@ class ServicesController extends Controller
     }
 
     // Get a specific Service by id
-    public function show(Service $services)
-    {
-        return response()->json(['message' => 'Service retrieved successfully', 'status' => 1, 'data' => $services]);
-    }
+   
     
     // Get a specific Service by id
-    public function showbyname($name)
+    public function show($name)
     {
-        $services = Service::where('title', $name)->first();
+        $services = Service::where('title', $name)->get();
         
         if(!$services) {
             return response()->json(['message' => 'Service not found', 'status' => 0]);

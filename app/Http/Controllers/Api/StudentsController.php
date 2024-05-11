@@ -22,21 +22,22 @@ class StudentsController extends Controller
     public function store(Request $request)
     {
         try {
+
             $validatedData = $request->validate([
                 'first_name' => 'required|string|max:255',
                 'last_name' => 'required|string|max:255',
-                //'phone' => 'required',
                 'dob' => 'required|date',
+                'email' => 'required|email|unique:students',
                 'parent_name' => 'nullable|string|max:255',
                 'parent_email' => 'nullable|email',
-                'mother_number' => 'required|string|max:255',
-                'father_number' => 'required|string|max:255',
+                'mobile_number' => 'required|string|max:255',
+                'gender' => 'required|string|max:255',
                 'sex' => 'nullable|string|max:255',
-                'course' => 'required|string|max:255',
                 'address' => 'required|string|max:255',
                 'emergency_contact' => 'nullable|string|max:255',
                 'emergency_contact_number' => 'nullable|string|max:255',
             ]);
+           
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json(['message' => 'Validation failed', 'errors' => $e->errors()], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
@@ -44,8 +45,32 @@ class StudentsController extends Controller
             return response()->json(['message' => 'Message received'], Response::HTTP_OK);
         }
 
+        function generateUniqueQqwId() {
+            // Generate a random string
+            $randomString = strtoupper(substr(md5(uniqid(mt_rand(), true)), 0, 8)); // Adjust the length as needed
+            
+            // Form the unique ID starting with "qqw" and appending the random string
+            $qqwId = 'YE' . $randomString;
+            
+            // Check if the ID already exists, generate a new one if it does
+            while (Student::where('uuid', $qqwId)->exists()) {
+                $randomString = substr(md5(uniqid(mt_rand(), true)), 0, 8);
+                $qqwId = 'Yene' . $randomString;
+            }
+        
+            return $qqwId;
+        }
+
+        $uniqueQqwId = generateUniqueQqwId();
+        $validatedData['uuid'] = $uniqueQqwId;
         $student = Student::create($validatedData);
-        return response()->json(['message' => 'Student created successfully', 'status' => 1, 'id' => $student->id], Response::HTTP_CREATED);
+
+        // Send the unique ID to the parent's email if provided
+        if (!empty($validatedData['email'])) {
+            \Mail::to($validatedData['email'])->send(new \App\Mail\SendUniqueId(  $validatedData['uuid'] , $validatedData['first_name']));
+        }
+
+        return response()->json(['message' => 'Student created successfully', 'status' => 1, 'id' => $student->uuid, 'unique_id' => $uniqueQqwId], Response::HTTP_CREATED);
     }
 
     // Get a specific Student by id
@@ -58,9 +83,11 @@ class StudentsController extends Controller
         return response()->json(['message' => 'Student retrieved successfully', 'status' => 1, 'data' => $student]);
     }
     // Get a specific Student by id
-    public function showbyname($name)
+ 
+
+    public function showbyid($uuid)
     {
-        $student = Student::where('title', $name)->first();
+        $student = Student::where('uuid', $uuid)->first();
         
         if(!$student) {
             return response()->json(['message' => 'Student not found', 'status' => 0]);
@@ -68,10 +95,9 @@ class StudentsController extends Controller
         
         return response()->json(['message' => 'Student retrieved successfully', 'status' => 1, 'data' => $student]);
     }
-
-    public function showbyid($id)
+    public function showbyname($id)
     {
-        $student = Student::find($id);
+        $student = Student::where('first_name', $id)->get();
         
         if(!$student) {
             return response()->json(['message' => 'Student not found', 'status' => 0]);

@@ -14,12 +14,13 @@ class GalleryController extends Controller
         $offset = $request->input('offset', 0);
         $limit = $request->input('limit', 10);
         $gallery = Gallery::offset($offset)->limit($limit)->latest()->get();
+        $galleryCount = $gallery->count();
         
         if($gallery->isEmpty()) {
-            return response()->json(['message' => 'No gallery found', 'status' => 0]);
+            return response()->json(['message' => 'No gallery found', 'status' => 0, 'length' => $galleryCount]);
         }
         
-        return response()->json(['message' => 'Gallery retrieved successfully', 'status' => 1, 'data' => $gallery]);
+        return response()->json(['message' => 'Gallery retrieved successfully', 'status' => 1, 'data' => $gallery, 'length' => $galleryCount]);
     }
     public function store(Request $request)
     {
@@ -55,7 +56,7 @@ class GalleryController extends Controller
     // Get a specific Gallery by id
     public function showbyname($name)
     {
-        $gallery = Gallery::where('title', $name)->first();
+        $gallery = Gallery::where('title', $name)->get();
         
         if(!$gallery) {
             return response()->json(['message' => 'Gallery not found', 'status' => 0]);

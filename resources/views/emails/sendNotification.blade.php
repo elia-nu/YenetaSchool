@@ -7,7 +7,7 @@
     <p>A new message has been created:</p>
 
     <p><strong></strong> Subject: Confirmation of Contact Us Submission - Yeneta Language and Cultural Academy</p>
-    <p> Dear {{ $name }},</p>
+    <p><strong> Dear {{ $name }},</strong></p>
     <p>
 
 

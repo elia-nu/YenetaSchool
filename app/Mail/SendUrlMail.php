@@ -30,7 +30,8 @@ class SendUrlMail extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.sendUrl')
+        return $this->subject('Payment Information')
+                    ->view('emails.sendUrl')
                     ->with(['url' => $this->url]);
     }
 }

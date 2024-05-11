@@ -17,12 +17,12 @@ class ProgramsController extends Controller
         $limit = $request->input('limit', 10);
         $programs = programs::offset($offset)->limit($limit)->latest()->get();
     
-        $messagesCount = $programs->count();
+        $programsCount = programs::count();
         if($programs->isEmpty()) {
-            return response()->json(['message' => 'No programs found', 'status' => 0, 'length' => $messagesCount]);
+            return response()->json(['message' => 'No programs found', 'status' => 0, 'length' => $programsCount]);
         }
         
-        return response()->json(['message' => 'Programs retrieved successfully', 'status' => 1, 'data' => $programs]);
+        return response()->json(['message' => 'Programs retrieved successfully', 'status' => 1, 'data' => $programs, 'length' => $programsCount]);
     }
     // Create a new program
     public function store(Request $request)
@@ -57,15 +57,12 @@ class ProgramsController extends Controller
 }
 
     // Get a specific program by id
-    public function show(programs $program)
-    {
-        return response()->json(['message' => 'Program retrieved successfully', 'status' => 1, 'data' => $program]);
-    }
+ 
     
     // Get a specific program by id
-    public function showbyname($name)
+    public function show($name)
     {
-        $program = programs::where('title', $name)->first();
+        $program = programs::where('title', $name)->get();
         
         if(!$program) {
             return response()->json(['message' => 'Program not found', 'status' => 0]);

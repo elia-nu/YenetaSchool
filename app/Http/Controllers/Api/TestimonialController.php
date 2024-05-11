@@ -48,15 +48,12 @@ class TestimonialController extends Controller
     }
 
     // Get a specific Testimonial by id
-    public function show(Testimonial $testimonial)
-    {
-        return response()->json(['message' => 'Testimonial retrieved successfully', 'status' => 1, 'data' => $testimonial]);
-    }
+  
     
     // Get a specific Testimonial by id
-    public function showbyname($name)
+    public function show($name)
     {
-        $testimonial = Testimonial::where('title', $name)->first();
+        $testimonial = Testimonial::where('author', $name)->get();
         
         if(!$testimonial) {
             return response()->json(['message' => 'Testimonial not found', 'status' => 0]);
@@ -65,37 +62,43 @@ class TestimonialController extends Controller
         return response()->json(['message' => 'Testimonial retrieved successfully', 'status' => 1, 'data' => $testimonial]);
     }
     // Update a specific Testimonial
-    public function update(Request $request, Testimonial $testimonial)
+   
+    public function update(Request $request, Testimonial  $program)
     {
-        $validatedData = $request->validate([
-        
-            'author' => 'required|string|max:255',
-            'author_am' => 'required|string|max:255',
-            'professional' => 'required|string|max:255',
-            'professional_am' => 'nullable|string|max:255',
-            'rating' => 'required|integer|min:1|max:5',
-        ]);
-
+        try {
+            $validatedData = $request->validate([
+                'author' => 'required|string|max:255',
+                'author_am' => 'required|string|max:255',
+                'professional' => 'required|string|max:255',
+                'professional_am' => 'nullable|string|max:255',
+                'rating' => 'required|integer|min:1|max:5',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['message' => 'Validation failed', 'errors' => $e->errors()], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+    
+        // Handle the image upload
         if ($request->hasFile('img')) {
             $image = $request->file('img'); // Assuming single file upload for simplicity
             $path = $image->store('public/images');
-            $validatedData['image'] = 'storage/' . substr($path, 7); // Removes 'public/' from the path
+            $validatedData['img_url'] = 'storage/' . substr($path, 7); // Removes 'public/' from the path
         }
-
-        $testimonial->update($validatedData);
-        if ($testimonial->wasChanged()) {
+    
+    
+        $program->update($validatedData);
+        if ($program->wasChanged()) {
             return response()->json(['message' => 'Successfully updated', 'status' => 1. ]);
         } else {
-            return response()->json(['message' => 'No changes made', 'status' => 0 , 'data' => $testimonial]);
+            return response()->json(['message' => 'No changes made', 'status' => 0 , 'data' => $program]);
         }
     }
     // Delete a specific Testimonial
-    public function destroy(Testimonial $testimonial)
+ 
+    public function destroy(Testimonial $program)
     {
-        $testimonial->delete();
+        $program->delete();
         return response()->json(['message' => 'Testimonial deleted successfully', 'status' => 1]);
     }
-
 
 
 

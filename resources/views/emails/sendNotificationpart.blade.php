@@ -24,7 +24,10 @@ Please feel free to contact us if you have any questions or require any assistan
 
 Warm regards,
 
-<p>info@yenetaschool.com</p> 
+
+<i class="fas fa-envelope"></i> Email: admission@yenetaschool.com, Info@yenetaschool.com
+        <br>
+        <i class="fas fa-phone"></i> Phone: +12403748205, +12403534436
 <p>School Administration</p> 
 <p>Yeneta Language and Cultural Academy</p>                                                                                                                                                               
 

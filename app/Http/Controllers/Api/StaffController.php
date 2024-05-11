@@ -7,15 +7,20 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 class StaffController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $staff = Staff::latest()->get();
+        $offset = $request->query('offset', 0);
+        $limit = $request->query('limit', 10);
+
+        $staffQuery = Staff::latest();
+        $staffCount = $staffQuery->count();
+        $staff = $staffQuery->offset($offset)->limit($limit)->get();
         
         if($staff->isEmpty()) {
-            return response()->json(['message' => 'No staff found', 'status' => 0 , 'length' => $messagesCount]);
+            return response()->json(['message' => 'No staff found', 'status' => 0, 'length' => $staffCount]);
         }
         
-        return response()->json(['message' => 'Staff retrieved successfully', 'status' => 1, 'data' => $staff]);
+        return response()->json(['message' => 'Staff retrieved successfully', 'status' => 1, 'data' => $staff, 'length' => $staffCount]);
     }
     public function store(Request $request)
     {
@@ -44,17 +49,14 @@ class StaffController extends Controller
     }
 
     // Get a specific Staff by id
-    public function show(Staff $staff)
-    {
-        return response()->json(['message' => 'Staff retrieved successfully', 'status' => 1, 'data' => $staff]);
-    }
+   
     
     // Get a specific Staff by id
-    public function showbyname($name)
+    public function show($name)
     {
-        $staff = Staff::where('title', $name)->first();
+        $staff = Staff::where('name', 'like', '%' . $name . '%')->get();
         
-        if(!$staff) {
+        if($staff->isEmpty()) {
             return response()->json(['message' => 'Staff not found', 'status' => 0]);
         }
         
