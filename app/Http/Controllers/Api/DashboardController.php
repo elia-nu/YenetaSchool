@@ -2,17 +2,82 @@
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
-use App\Models\programs;
+use App\Models\Programs;
+use App\Models\Partner;
+use App\Models\Student;
+use App\Models\Product;
+use App\Models\RegisteredStudent;
+use App\Models\Gallery;
+use App\Models\Event;
+use App\Models\Message;
+use App\Models\Service;
+use App\Models\Staff;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
 
 
-class ProgramsController extends Controller
+class DashboardController extends Controller
 {
     // Get all programs
+    
+    public function getAllCounts()
+{
+    $counts = [
+        'programs_count' => Programs::count(),
+        'partners_count' => Partner::count(),
+        'students_count' => Student::count(),
+        'products_count' => Product::count(),
+        'registered_students_count' => [
+            'total' => RegisteredStudent::count(),
+           'totalP' => RegisteredStudent::where('PaymentStatus', false)->count(),
+           'male' => Student::where('gender', 'male')->count(),
+           'female' => Student::where('gender', 'female')->count(),
+            'enrolled' => RegisteredStudent::where('status', 'enrolled')->count(),
+       //     'enrolled_by_program' => RegisteredStudent::where('status', 'enrolled')
+       //                         ->with('program') // Assuming there's a 'program' relationship defined in RegisteredStudent model
+       //                         ->get()
+       //                         ->groupBy('program.name') // Group by program name
+       //                         ->map(function ($students) {
+       //                             return $students->count(); // Count students in each program
+       //                         })
+        ],
+       // 'galleries_count' => Gallery::count(),
+        'events_count' => Event::count(),
+        'messages_count' => Message::count(),
+        'services_count' => Service::count(),
+        'staff_count' => Staff::count(),
+        'orders_count' => [
+            'total' => Order::count(),
+            'unpaid' => Order::where('deliveryStatus', 'Unpaid')->count(),
+            'Pending' => Order::where('deliveryStatus', 'Pending')->count(),
+            'delivered' => Order::where('deliveryStatus', 'Delivered')->count(),
+            'Onroute' => Order::where('deliveryStatus', 'Onroute')->count()
+        ]
+
+          
+    ];
+    $programList = Programs::all()->pluck('title', 'id');  // Changed 'name' to 'title' to list by title
+    $counts['program_list'] = $programList;
+    $enrolledStudentsByProgram = RegisteredStudent::where('status', 'enrolled')
+                                                     ->select('course', DB::raw('count(*) as total'))  // Changed 'id' to 'program_id' assuming 'program_id' is the correct foreign key
+                                                     ->groupBy('course')
+                                                     ->get()
+                                                     ->mapWithKeys(function ($item) use ($programList) {
+                                                         if (!isset($programList[$item->course])) {  // Changed 'i' to 'program_i'
+                                                             return [$item->course=> 0];  // Changed 'i' to 'program_i'
+                                                         }
+                                                         return [$programList[$item->course] => $item->total ?: 0];  // Changed 'id' to 'program_id'
+                                                     });
+    $counts['enrolled_students_by_program1'] = $enrolledStudentsByProgram;
+    return response()->json(['message' => 'All counts retrieved successfully', 'status' => 1, 'data' => $counts , 'BAR' =>  $enrolledStudentsByProgram ]);
+}
+    
     public function index(Request $request)
     {
+        $programsCount = Order::count();
         $offset = $request->input('offset', 0);
         $limit = $request->input('limit', 10);
         $programs = programs::offset($offset)->limit($limit)->latest()->get();

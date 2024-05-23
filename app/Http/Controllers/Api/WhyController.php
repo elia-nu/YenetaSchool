@@ -18,26 +18,28 @@ class WhyController extends Controller
         }
         
         return response()->json(['message' => 'Programs retrieved successfully', 'status' => 1, 'data' => $programs]);
-    }
 
-    public function update(Request $request, Why $aboutus)
+    }
+    public function update(Request $request, Why $program)
     {
         $validatedData = $request->validate([
-            'mission' => 'required|string|',
-            'Vision' => 'required|string|',
-            'value' => 'required|string|',
-            'value_am' => 'required|string|',
-            'Vision_am' => 'required|string|',
-            'mission_am' => 'required|string|',
-         
+            'mission' => 'nullable|string',
+            'vision' => 'nullable|string',
+            'value' => 'nullable|string',
+            'value_am' => 'nullable|string',
+            'vision_am' => 'nullable|string',
+            'mission_am' => 'nullable|string',
         ]);
-    
-        $aboutus->update($validatedData);
-        if ($aboutus->wasChanged()) {
+
+        $program->fill($validatedData);
+
+        if ($program->isDirty()) {
+            $program->save();
             return response()->json(['message' => 'Successfully updated', 'status' => 1]);
         } else {
-            return response()->json(['message' => 'No changes made', 'status' => 0, 'data' => $aboutus]);
+            return response()->json(['message' => 'No changes detected', 'status' => 0, 'data' => $program]);
         }
     }
+    
     //
 }

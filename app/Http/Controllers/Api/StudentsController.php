@@ -97,7 +97,7 @@ class StudentsController extends Controller
     }
     public function showbyname($id)
     {
-        $student = Student::where('first_name', $id)->get();
+        $student = Student::latest()->whereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$id}%"])->get();
         
         if(!$student) {
             return response()->json(['message' => 'Student not found', 'status' => 0]);

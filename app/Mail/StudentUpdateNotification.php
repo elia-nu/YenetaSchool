@@ -7,22 +7,24 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class SendEmailNotification extends Mailable
+class StudentUpdateNotification extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $email;
-    public $name;
-
+    public $course;
+   public $name;
+   public $uuid;
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($name , $email)
+    public function __construct($course , $name , $uuid)
     {
-        $this->email = $email;
+        $this-> course = $course;
         $this->name = $name;
+        $this->uuid = $uuid;
+
     }
 
     /**
@@ -32,7 +34,7 @@ class SendEmailNotification extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.sendNotification')
-                    ->subject('ContactUs Confirmation');
+        return $this->view('emails.StudentUpdateNotification')
+                    ->subject('Payment Confirmation');
     }
 }

@@ -33,6 +33,6 @@ class SendEmailNotificationpart extends Mailable
     public function build()
     {
         return $this->view('emails.sendNotificationpart')
-                    ->subject('New Message Created');
+                    ->subject('Partnership Confirmation');
     }
 }

@@ -22,6 +22,7 @@ class PaymentController extends Controller
             'cancel_url' => 'required|url',
             'student_id' => 'required|string',  // Make sure this is passed correctly
             'email' => 'required|email'
+            
         ]);
     
         // Creating the session with validated data

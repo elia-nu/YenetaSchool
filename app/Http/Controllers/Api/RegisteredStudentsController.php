@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\api;
 use App\Mail\sendEmail;
+use App\Mail\StudentUpdateNotification;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Events\StudentEnrolled;
@@ -25,7 +26,21 @@ class RegisteredStudentsController extends Controller
         return response()->json(['message' => 'Registered students retrieved successfully', 'status' => 1, 'data' => $registeredstudent, 'length' => $studentsCount]);
     }
 
-   
+    public function Chart(Request $request)
+    {
+        $currentDate = now()->toDateString();
+        
+        $enrolledStudentsByCourse = RegisteredStudent::where('Status', 'enrolled')
+                                                     ->select('Course', DB::raw('count(*) as total'))
+                                                     ->groupBy('Course')
+                                                     ->get();
+
+        return response()->json([
+            'status' => 1,
+            'date' => $currentDate,
+            'enrolled_students_by_course' => $enrolledStudentsByCourse
+        ]);
+    }  
 
     public function index1(Request $request)
     {
@@ -52,12 +67,13 @@ class RegisteredStudentsController extends Controller
                                            ->limit($limit)
                                            ->latest()->get();
         $activeStudentsCount = RegisteredStudent::where('Status', 'enrolled')->count();
+        $studentsCount = RegisteredStudent::count();
 
         if($activeStudents->isEmpty()) {
             return response()->json(['message' => 'No active students found', 'status' => 0, 'length' => $activeStudentsCount]);
         }
 
-        return response()->json(['message' => 'Active students retrieved successfully', 'status' => 1, 'data' => $activeStudents, 'length' => $activeStudentsCount]);
+        return response()->json(['message' => 'Active students retrieved successfully', 'status' => 1, 'data' => $activeStudents, 'length' => $activeStudentsCount , 'length1' => $studentsCount]);
     }
 
     public function Unpaid(Request $request)
@@ -132,22 +148,20 @@ class RegisteredStudentsController extends Controller
                 'Course' => 'required|string|max:255',
                 'start_date' => 'required',
                 'end_date' => 'required|string|max:255',
-                'Completed_date' => 'required|string|max:255',
+ 
                 'PaymentStatus' => 'required|boolean',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json(['message' => 'Validation failed', 'errors' => $e->errors()], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
     
-        // Handle the image upload
-       
-    
-    
         $program->update($validatedData);
         if ($program->wasChanged()) {
-            return response()->json(['message' => 'Successfully updated', 'status' => 1. ]);
+            // Send email with Student ID and Course
+            Mail::to($program->Semester)->send(new StudentUpdateNotification($validatedData['Course'], $program->Name, $program->StudentId));
+            return response()->json(['message' => 'Successfully updated and email sent', 'status' => 1]);
         } else {
-            return response()->json(['message' => 'No changes made', 'status' => 0 , 'data' => $program]);
+            return response()->json(['message' => 'No changes made', 'status' => 0, 'data' => $program]);
         }
     }
 
@@ -221,7 +235,7 @@ class RegisteredStudentsController extends Controller
 
     public function searchById($id)
     {
-        $student = RegisteredStudent::where('StudentId', $id)->first();
+        $student = RegisteredStudent::where('StudentId', $id)->get();
         
         if(!$student) {
             return response()->json(['message' => 'Student not found', 'status' => 0]);

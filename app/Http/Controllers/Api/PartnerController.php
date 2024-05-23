@@ -52,12 +52,19 @@ class PartnerController extends Controller
     }
     
     // Delete a specific Message
-    public function destroy(Partner $messages)
+    public function destroy1(Partner $messages)
     {
         $messages->delete();
         return response()->json(['message' => 'Message deleted successfully', 'status' => 1]);
     }
-
+    public function destroy(Partner $program)
+    {
+        if ($program->delete()) {
+            return response()->json(['message' => 'Program deleted successfully', 'status' => 1]);
+        } else {
+            return response()->json(['message' => 'Failed to delete the program', 'status' => 0]);
+        }
+    }
 
     //
 }

@@ -57,7 +57,7 @@ class EventsController extends Controller
     // Get a specific event by id
     public function show($name)
     {
-        $event = Event::where('title', $name)->get();
+        $event = Event::where('title', 'like', '%' . $name . '%')->get();
         
         if(!$event) {
             return response()->json(['message' => 'event not found', 'status' => 0]);

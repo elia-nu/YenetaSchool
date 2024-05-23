@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\BlogsController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\InvoiceController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Mail\MailController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -44,10 +45,14 @@ Route::get('', function(){
 
 });
 
+//Count
+Route::get('getAllCounts', [DashboardController::class, 'getAllCounts'])->name('RegisteredStudent.index');
+
+
 //Order
 Route::get('Order', [OrderController::class, 'index'])->name('RegisteredStudent.index');
 Route::get('OrderStatus', [OrderController::class, 'index1'])->name('RegisteredStudent.index');
-Route::get('search/{program}', [OrderController::class, 'search']);
+Route::get('Search/{program}', [OrderController::class, 'search']);
 Route::get('Order/{program}', [OrderController::class, 'show']);
 Route::post('Order', [OrderController::class, 'store']);
 Route::put('/Order/{program}', [OrderController::class, 'update']);
@@ -78,10 +83,10 @@ Route::put('/verify/{program}', [RegisteredStudentsController::class, 'verify'])
 Route::put('/verify2/{program}', [RegisteredStudentsController::class, 'verify2']);
 Route::delete('/RegisteredStudents/{program}', [RegisteredStudentsController::class, 'destroy']);
 Route::get('/PendingPayment', [RegisteredStudentsController::class, 'Unpaid']);
+Route::get('/Chart', [RegisteredStudentsController::class, 'Chart']);
 
 
 //Gallerys
-
 Route::get('Gallerys', [GalleryController::class, 'index']);
 Route::get('Gallerys/{program}', [GalleryController::class, 'show']);
 Route::post('Gallerys', [GalleryController::class, 'store']);
@@ -189,7 +194,7 @@ Route::put('/mainTitle/1', [MainTitleController::class, 'update']);
 
 Route::get('Partner', [PartnerController::class, 'index'])->name('Why.index');
 Route::post('Partner', [PartnerController::class, 'store']);
-Route::delete('/partner/1', [PartnerController::class, 'destroy']);
+Route::delete('/Partner/{program}', [PartnerController::class, 'destroy']);
 //Whys
 
 Route::get('why', [WhyController::class, 'index'])->name('Why.index');

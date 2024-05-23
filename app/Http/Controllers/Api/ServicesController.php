@@ -43,8 +43,7 @@ class ServicesController extends Controller
     // Get a specific Service by id
     public function show($name)
     {
-        $services = Service::where('title', $name)->get();
-        
+        $services = Service::where('title', 'like', '%' . $name . '%')->get();
         if(!$services) {
             return response()->json(['message' => 'Service not found', 'status' => 0]);
         }

@@ -100,4 +100,43 @@ class UserController extends Controller
             ], 500);
         }
     }
+    /**
+ * Reset User Password
+ * @param Request $request
+ * @return \Illuminate\Http\JsonResponse
+ */
+public function resetPassword(Request $request)
+{
+    try {
+        $validateUser = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users,email',
+            'password' => 'required|confirmed',
+            'password_confirmation' => 'required'
+        ]);
+
+        if ($validateUser->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation error',
+                'errors' => $validateUser->errors()
+            ], 401);
+        
+        }
+
+        $user = User::where('email', $request->email)->first();
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Password reset successfully'
+        ], 200);
+
+    } catch (\Throwable $th) {
+        return response()->json([
+            'status' => false,
+            'message' => $th->getMessage()
+        ], 500);
+    }
+}
 }

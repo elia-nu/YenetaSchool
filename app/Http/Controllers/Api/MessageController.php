@@ -40,16 +40,15 @@ class MessageController extends Controller
         return response()->json(['message' => 'Message created successfully', 'status' => 1 ,'message' => $messages], Response::HTTP_CREATED);
     }
     // Get a specific Message by id
-    public function show(Message $messages)
+    public function show1(Message $messages)
     {
         return response()->json(['message' => 'Message retrieved successfully', 'status' => 1, 'data' => $messages]);
     }
     
     // Get a specific Message by id
-    public function showbyname($name)
+    public function show($name)
     {
-        $messages = Message::where('email', $name)->first();
-        
+        $messages = Message::where('email', 'like', '%' . $name . '%')->latest()->get();
         if(!$messages) {
             return response()->json(['message' => 'Message not found', 'status' => 0]);
         }
@@ -73,10 +72,15 @@ class MessageController extends Controller
         }
     }
     // Delete a specific Message
-    public function destroy(Message $messages)
+    public function destroy1(Message $messages)
     {
         $messages->delete();
         return response()->json(['message' => 'Message deleted successfully', 'status' => 1]);
+    }
+    public function destroy(Message $program)
+    {
+        $program->delete();
+        return response()->json(['message' => 'Program deleted successfully', 'status' => 1]);
     }
 
 

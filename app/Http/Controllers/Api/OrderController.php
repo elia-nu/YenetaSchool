@@ -79,6 +79,10 @@ class OrderController extends Controller
     // Create the order record
     $order = Order::create($validatedData);
 
+
+    // Send email with order details
+    $date = now()->toDateString();
+    \Mail::to($validatedData['email'])->send(new \App\Mail\OrderConfirmationMail($validatedData['first_name'], $validatedData['orderNo'], $validatedData['price'], $date ,$validatedData['name']));
     // Return a successful response
     return response()->json(['status' => 1, 'message' => 'Order created successfully',  'order' => $order], Response::HTTP_CREATED);
 }
@@ -93,20 +97,11 @@ class OrderController extends Controller
     {
         try {
             $validatedData = $request->validate([
-                'first_name' => 'required|string|max:255',
-                'last_name' => 'required|string|max:255',
-                'email' => 'required|email|max:255',
-                'phone' => 'required|string|max:20',
-                'address1' => 'required|string|max:255',
-                'address2' => 'nullable|string|max:255',
-                'city' => 'required|string|max:255',
-                'state' => 'required|string|max:255',
-                'zipcode' => 'required|string|max:10',
                 'deliveryStatus' => 'required|string|max:50',
             ]);
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        return response()->json(['message' => 'Validation failed', 'errors' => $e->errors()], Response::HTTP_UNPROCESSABLE_ENTITY);
-    }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['message' => 'Validation failed', 'errors' => $e->errors()], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
         
         // Handle the image upload
         if ($request->hasFile('img')) {
@@ -115,11 +110,25 @@ class OrderController extends Controller
             $validatedData['image'] = 'storage/' . substr($path, 7); // Removes 'public/' from the path
         }
     
-          $program->update($validatedData);
+        $program->update($validatedData);
+
         if ($program->wasChanged()) {
-            return response()->json(['message' => 'Successfully updated', 'status' => 1 , 'data' => $program ]);
+            // Send email if the delivery status is 'Onroute' or 'Delivered'
+            if (in_array($validatedData['deliveryStatus'], ['OnRoute', 'Delivered'])) {
+                $date = now()->toDateString();
+                \Mail::to($program->email)->send(new \App\Mail\OrderStatusUpdateMail(
+                    $program->first_name,
+                    $program->last_name,
+                    $validatedData['deliveryStatus'],
+                    $date,
+                    $program->orderNo,
+                    $program->name
+                ));
+            }
+
+            return response()->json(['message' => 'Successfully updated', 'status' => 1, 'data' => $program]);
         } else {
-            return response()->json(['message' => 'No changes made', 'status' => 0 , 'data' => $program]);
+            return response()->json(['message' => 'No changes made', 'status' => 0, 'data' => $program]);
         }
     }
     public function destroy($id)
@@ -128,15 +137,15 @@ class OrderController extends Controller
         return response()->json(['message' => 'Order deleted successfully', 'status' => 1], 200);
     }
 
-    public function search(Request $request)
+    
+    public function search($name)
     {
-        $query = Order::query();
-        if ($request->has('orderNo')) {
-            $query->where('orderNo', $request->input('orderNo'));
-            $results = $query->get();
-            return response()->json(['message' => 'Success', 'status' => 1, 'data' => $results]);
-        } else {
-            return response()->json(['message' => 'No order number macthed the search query', 'status' => 0]);
+        $program = Order::where('orderNo', $name)->get();
+        
+        if(!$program) {
+            return response()->json(['message' => 'Program not found', 'status' => 0]);
         }
+        
+        return response()->json(['message' => 'Program retrieved successfully', 'status' => 1, 'data' => $program]);
     }
 }

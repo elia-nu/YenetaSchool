@@ -53,7 +53,7 @@ class TestimonialController extends Controller
     // Get a specific Testimonial by id
     public function show($name)
     {
-        $testimonial = Testimonial::where('author', $name)->get();
+        $testimonial = Testimonial::where('author', 'like', '%' . $name . '%')->get();
         
         if(!$testimonial) {
             return response()->json(['message' => 'Testimonial not found', 'status' => 0]);
