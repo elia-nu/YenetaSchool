@@ -11,13 +11,14 @@ use Illuminate\Mail\Mailables\Envelope;
 class sendEmail extends Mailable
 {
     use Queueable, SerializesModels;
+    public $time;
     public $course;
     public $startDate;
     public $endDate;
     public $Name;
 
-    public function __construct($course, $startDate, $endDate,$Name)
-    {
+    public function __construct( $time,$course, $startDate, $endDate,$Name)
+    {   $this->time = $time;
         $this->course = $course;
         $this->startDate = $startDate;
         $this->endDate = $endDate;

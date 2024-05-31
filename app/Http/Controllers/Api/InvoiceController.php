@@ -26,7 +26,15 @@ class InvoiceController extends Controller
     }
     public function store(Request $request)
     {
-        return Invoice::create($request->all());
+        $invoiceData = $request->all();
+        
+        // Generate a unique invoiceId and check for its uniqueness
+        do {
+            $invoiceId = uniqid('inv_');
+        } while (Invoice::where('invoiceId', $invoiceId)->exists());
+        
+        $invoiceData['invoiceId'] = $invoiceId;
+        return Invoice::create($invoiceData);
     }
 
     public function show($name)

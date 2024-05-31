@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\BlogsController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\InvoiceController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\ScheduleController;
 use App\Mail\MailController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -74,6 +75,7 @@ Route::delete('/Product/{program}', [ProductController::class, 'destroy']);
 
 Route::get('RegisteredStudents', [RegisteredStudentsController::class, 'index'])->name('RegisteredStudent.index');
 Route::get('searchById/{program}', [RegisteredStudentsController::class, 'searchById']);
+Route::get('searchById1/{program}', [RegisteredStudentsController::class, 'searchById1']);
 Route::get('searchByName/{program}', [RegisteredStudentsController::class, 'searchByName']);
 Route::get('RegisteredStudents/{program}', [RegisteredStudentsController::class, 'show']);
 Route::get('NumReg', [RegisteredStudentsController::class, 'index2']);
@@ -213,6 +215,17 @@ Route::post('/auth/login', [UserController::class, 'loginUser']);
 //Payment
 
 Route::post('checkout', [PaymentController::class, 'createCheckoutSession']);
+
+
+
+//Schedule
+
+Route::get('/Schedule', [ScheduleController::class, 'index']);
+Route::post('/Schedule', [ScheduleController::class, 'store']);
+Route::get('/Schedule/{id}', [ScheduleController::class, 'show']);
+Route::put('/Schedule/{id}', [ScheduleController::class, 'update']);
+Route::put('/nosit/{id}', [ScheduleController::class, 'decrementAmount']);
+Route::delete('/Schedule/{id}', [ScheduleController::class, 'destroy']);
 
 //Invoices
 

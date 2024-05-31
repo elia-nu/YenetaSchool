@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Events\StudentEnrolled;
 use App\Models\RegisteredStudent;
+use App\Models\Schedule;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
 
@@ -103,12 +104,17 @@ class RegisteredStudentsController extends Controller
             'start_date' => 'required|string',
             'end_date' => 'required|string|max:255',
             'Semester' => 'required|string|max:255',
+            'time' => 'required|string|max:255',
         ]);
+
         $validatedData['Status'] = 'enrolled';
         $validatedData['PaymentStatus'] = false;
         $registeredStudent = RegisteredStudent::create($validatedData);
-        $email = $registeredStudent -> Semester;  // Ensure this is correctly set
-        Mail::to($email)->send(new sendEmail($validatedData['Course'], $validatedData['start_date'], $validatedData['end_date'],$validatedData['Name']));
+
+
+        $email = $registeredStudent->Semester;  // Ensure this is correctly set
+        Mail::to($email)->send(new sendEmail($validatedData['time'], $validatedData['Course'], $validatedData['start_date'], $validatedData['end_date'], $validatedData['Name']));
+
         return response()->json([
             'message' => 'RegisteredStudent created successfully', 
             'status' => 1, 
@@ -243,6 +249,17 @@ class RegisteredStudentsController extends Controller
         
         return response()->json(['message' => 'Student retrieved successfully', 'status' => 1, 'data' => $student]);
     }
+    public function searchById1($id)
+    {
+        $student = RegisteredStudent::where('StudentId', $id)->latest()->where('PaymentStatus', 0)->get();
+        if(!$student) {
+            return response()->json(['message' => 'Student not found', 'status' => 0]);
+        }
+        
+        return response()->json(['message' => 'Student retrieved successfully', 'status' => 1, 'data' => $student]);
+    }
+    
 
     //
 }
+
