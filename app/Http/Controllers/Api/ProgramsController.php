@@ -37,7 +37,10 @@ class ProgramsController extends Controller
         'teacher_am' => 'sometimes|string',
         'Course' => 'required|string',
         'start_date' => 'required',
-        'end_date' => 'required', // Add specific date validation as needed
+        'end_date' => 'required',
+        'P2' => 'required',
+        'P1' => 'sometimes',
+         // Add specific date validation as needed
         // Change 'img_url' to 'image' and expect a file instead of a URL
  // This line changes to accept an image file
     ]);
@@ -62,7 +65,7 @@ class ProgramsController extends Controller
     // Get a specific program by id
     public function show($name)
     {
-        $program = programs::where('title', 'like', '%' . $name . '%')->get();
+        $program = programs::where('title', 'like', '%' . $name . '%')->latest()->get();
         if(!$program) {
             return response()->json(['message' => 'Program not found', 'status' => 0]);
         }
@@ -82,7 +85,10 @@ class ProgramsController extends Controller
             'teacher_am' => 'sometimes|string',
             'Course' => 'required|string',
             'start_date' => 'required',
-            'end_date' => 'required',  // Add specific date validation as needed
+            'end_date' => 'required',  
+            'P2' => 'required',
+            'P1' => 'required',
+            // Add specific date validation as needed
             // Change 'img_url' to 'image' and expect a file instead of a URL
      // This line changes to accept an image file
         ]);

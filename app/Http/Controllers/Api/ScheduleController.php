@@ -69,8 +69,8 @@ class ScheduleController extends Controller
     // Step 2: Get the amount to decrement from the request, default is 1
     $amountToDecrement = $request->input('amount', 1);
 
-    // Step 3: Check if the current 'nosit' is greater than or equal to the amount to decrement
-    if ($schedule->nosit >= 0) {
+    // Step 3: Check if the current 'nosit' is greater than zero
+    if ($schedule->nosit > 0) {
         // Step 4: Decrement the 'nosit' value
         $schedule->nosit -= $amountToDecrement;
 
@@ -80,8 +80,8 @@ class ScheduleController extends Controller
         // Step 6: Return a success response with the updated Schedule data
         return response()->json(['message' => 'Amount decremented successfully', 'status' => 1, 'data' => $schedule]);
     } else {
-        // Step 7: Return an error response if there is insufficient 'nosit' to decrement
-        return response()->json(['message' => 'Insufficient amount to decrement', 'status' => 0], 400);
+        // Step 7: Return a success response indicating no decrement was needed
+        return response()->json(['message' => 'No decrement needed', 'status' => 1, 'data' => $schedule]);
     }
 }
 

@@ -12,6 +12,6 @@ class programs extends Model
     protected $table = 'classes';
 
     protected $fillable = [
-        'title', 'title_am', 'description', 'description_am', 'price', 'teachers', 'teacher_am', 'Course', 'start_date', 'end_date', 'img_url'
+        'title', 'title_am', 'description', 'description_am', 'price', 'teachers', 'teacher_am', 'Course', 'start_date', 'end_date', 'img_url', 'P1', 'P2'
     ];
 }

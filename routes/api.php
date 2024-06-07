@@ -86,6 +86,8 @@ Route::put('/verify2/{program}', [RegisteredStudentsController::class, 'verify2'
 Route::delete('/RegisteredStudents/{program}', [RegisteredStudentsController::class, 'destroy']);
 Route::get('/PendingPayment', [RegisteredStudentsController::class, 'Unpaid']);
 Route::get('/Chart', [RegisteredStudentsController::class, 'Chart']);
+Route::get('/siblings', [RegisteredStudentsController::class, 'siblings']);
+Route::get('/sublink', [RegisteredStudentsController::class, 'sendEmailToEnrolledStudents']);
 
 
 //Gallerys
@@ -216,6 +218,10 @@ Route::post('/auth/login', [UserController::class, 'loginUser']);
 
 Route::post('checkout', [PaymentController::class, 'createCheckoutSession']);
 
+Route::post('checkout1', [PaymentController::class, 'createSubscriptionSession']);
+
+Route::post('checkout2', [PaymentController::class, 'createSubscriptionSession1']);
+Route::get('/subscription/success', [PaymentController::class, 'handleSuccessPage']);
 
 
 //Schedule

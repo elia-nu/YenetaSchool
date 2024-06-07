@@ -3,13 +3,16 @@
 namespace App\Http\Controllers\api;
 use App\Mail\sendEmail;
 use App\Mail\StudentUpdateNotification;
+use App\Mail\sendEmail1;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Events\StudentEnrolled;
 use App\Models\RegisteredStudent;
 use App\Models\Schedule;
+use App\Models\programs;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
+use App\Jobs\SendEmailToEnrolledStudentsJob; // Added this line to include the SendEmailToEnrolledStudentsJob class
 
 class RegisteredStudentsController extends Controller
 {
@@ -27,22 +30,23 @@ class RegisteredStudentsController extends Controller
         return response()->json(['message' => 'Registered students retrieved successfully', 'status' => 1, 'data' => $registeredstudent, 'length' => $studentsCount]);
     }
 
-    public function Chart(Request $request)
+    public function chart(Request $request)
     {
         $currentDate = now()->toDateString();
         
-        $enrolledStudentsByCourse = RegisteredStudent::where('Status', 'enrolled')
-                                                     ->select('Course', DB::raw('count(*) as total'))
-                                                     ->groupBy('Course')
-                                                     ->get();
+        $enrolledStudentsByCourse = RegisteredStudent::where('status', 'enrolled')
+                                                     ->select('course', RegisteredStudent::raw('count(*) as total'))
+                                                     ->groupBy('course')
+                                                     ->get()
+                                                     ->pluck('total', 'course')
+                                                     ->toArray();
 
         return response()->json([
             'status' => 1,
             'date' => $currentDate,
-            'enrolled_students_by_course' => $enrolledStudentsByCourse
+            'Students in course' => $enrolledStudentsByCourse
         ]);
     }  
-
     public function index1(Request $request)
     {
         $currentDate = now()->toDateString();
@@ -85,6 +89,7 @@ class RegisteredStudentsController extends Controller
         $unpaidStudents = RegisteredStudent::where('PaymentStatus', false)
                                            ->offset($offset)
                                            ->limit($limit)
+                                           ->latest()
                                            ->get();
 
         $totalUnpaid = RegisteredStudent::where('PaymentStatus', false)->count();
@@ -95,34 +100,51 @@ class RegisteredStudentsController extends Controller
 
         return response()->json(['message' => 'Unpaid students retrieved successfully', 'status' => 1, 'data' => $unpaidStudents, 'length' => $totalUnpaid]);
     }
+    public function Siblings(Request $request)
+    {
+        $endDate = $request->input('end_date');
+
+        $unpaidStudents = RegisteredStudent::where('end_date', $endDate)
+                                           ->where('Status', 'enrolled')
+                                           ->get();
+
+       
+
+        if($unpaidStudents->isEmpty()) {
+            return response()->json(['message' => 'No unpaid students found', 'status' => 0 , 'data' => $unpaidStudents]);
+        }
+
+        return response()->json(['message' => 'Unpaid students retrieved successfully', 'status' => 1, 'data' => $unpaidStudents]);
+    }
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            'StudentId' => 'required|string|max:255',
-            'Name' => 'required|string|max:255',
-            'Course' => 'required|string|max:255',
-            'start_date' => 'required|string',
-            'end_date' => 'required|string|max:255',
-            'Semester' => 'required|string|max:255',
-            'time' => 'required|string|max:255',
-        ]);
+        try {
+            $validatedData = $request->validate([
+                'StudentId' => 'required|string|max:255',
+                'Name' => 'required|string|max:255',
+                'Course' => 'required|string|max:255',
+                'start_date' => 'required|string',
+                'end_dat' => 'required|string|max:255',
+                'Semester' => 'required|string|max:255',
+                'time' => 'required|string|max:255',
+                'end_date' => 'required|string|max:255',
+                'sublink' => 'sometimes|string|max:255',                
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['message' => 'Validation failed', 'errors' => $e->errors()], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
 
         $validatedData['Status'] = 'enrolled';
         $validatedData['PaymentStatus'] = false;
         $registeredStudent = RegisteredStudent::create($validatedData);
 
-
         $email = $registeredStudent->Semester;  // Ensure this is correctly set
-        Mail::to($email)->send(new sendEmail($validatedData['time'], $validatedData['Course'], $validatedData['start_date'], $validatedData['end_date'], $validatedData['Name']));
+        Mail::to($email)->send(new sendEmail($validatedData['time'], $validatedData['Course'], $validatedData['start_date'], $validatedData['end_dat'], $validatedData['Name']));
 
         return response()->json([
             'message' => 'RegisteredStudent created successfully', 
             'status' => 1, 
-            'Course' => $validatedData['Course'], 
-            'start_date' => $validatedData['start_date'], 
-            'Semester' => $validatedData['Semester'], 
-            'end_date' => $validatedData['end_date'],
-            'qq' => $qq ?? null
+            'Course' => $registeredStudent
         ], Response::HTTP_CREATED);
     }
     // Get a specific RegisteredStudent by id
@@ -131,7 +153,6 @@ class RegisteredStudentsController extends Controller
         return response()->json(['message' => 'RegisteredStudent retrieved successfully', 'status' => 1, 'data' => $registeredstudent]);
     }
 
-  
 
 
     // Get a specific RegisteredStudent by id
@@ -219,6 +240,7 @@ class RegisteredStudentsController extends Controller
             'start_date' => 'required',
             'end_date' => 'required|string|max:255',
             'PaymentStatus' => 'required|boolean',
+            'sublink' => 'required|string|max:255',
         ]);
 
         // Log the received data
@@ -259,7 +281,10 @@ class RegisteredStudentsController extends Controller
         return response()->json(['message' => 'Student retrieved successfully', 'status' => 1, 'data' => $student]);
     }
     
-
+    public function sendEmailToEnrolledStudents()
+    {
+        dispatch(new SendEmailToEnrolledStudentsJob());
+        return response()->json(['message' => 'Emails are being sent in the background', 'status' => 1]);
+    }
     //
 }
-

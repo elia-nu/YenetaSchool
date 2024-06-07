@@ -12,7 +12,7 @@ class RegisteredStudent extends Model
     protected $table = 'registeredstudent';
 
     protected $fillable = [
-        'StudentId', 'Name', 'Course', 'Semester','Completed_date', 'PaymentStatus','Amount','Status','time'
+        'StudentId', 'Name', 'Course', 'Semester','Completed_date', 'PaymentStatus','Amount','Status','time','end_date','sublink'
     ];
 
   }

@@ -95,7 +95,7 @@ class ProductController extends Controller
     
     public function show($name)
     {
-        $program = Product::where('name', $name)->get();
+        $program = Product::where('name','like', '%' . $name . '%')->latest()->get();
         
         if(!$program) {
             return response()->json(['message' => 'Product not found', 'status' => 0]);

@@ -39,7 +39,7 @@ class InvoiceController extends Controller
 
     public function show($name)
     {
-        $program = Invoice::where('Student_id', $name)->get();
+        $program = Invoice::where('Student_id', 'like', '%' . $name . '%')->latest()->get();
         
         if(!$program) {
             return response()->json(['message' => 'Program not found', 'status' => 0]);
